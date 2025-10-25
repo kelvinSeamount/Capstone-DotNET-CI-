@@ -1,0 +1,14 @@
+@model NoteApp.Models.Note
+
+<h2 class="mb-4">📄 Note Details</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Title</h4>
+        <p class="card-text">@Model.Content</p>
+        <p class="text-muted">Created at: @Model.CreatedAt.ToString("MM/dd/yyyy HH:mm")</p>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Back</a>
+    </div>
+</div>
+

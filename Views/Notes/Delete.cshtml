@@ -1,0 +1,23 @@
+@model NoteApp.Models.Note
+
+@{
+    ViewData["Title"] = "Delete Note";
+}
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h2 class="text-danger mb-3">🗑️ Delete Note</h2>
+        <p class="lead">Are you sure you want to permanently delete this note?</p>
+
+        <h4 class="fw-bold">@Model.Title</h4>
+        <p><strong>Created at:</strong> @Model.CreatedAt.ToString("f")</p>
+        <p>@Model.Content</p>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2">Yes, Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+

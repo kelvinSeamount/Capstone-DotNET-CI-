@@ -1,0 +1,159 @@
+@model IEnumerable<NoteApp.Models.Note>
+@{
+    ViewData["Title"] = "All Notes";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .all-notes-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #facc15;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-bar {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+
+    .note-card {
+        background-color: #2a2a3b;
+        color: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.4s ease-in-out;
+        animation: fadeInUp 0.4s ease both;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        transform-origin: center;
+    }
+
+    .note-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #00ff99, 0 0 30px rgba(0, 255, 153, 0.3); /* 💚 parrot green neon */
+    }
+
+    .note-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .note-meta {
+        font-size: 0.85rem;
+        color: #dcdcdc;
+        margin-top: 6px;
+    }
+
+    .note-buttons {
+        margin-top: 15px;
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+    }
+
+    .note-btn {
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        text-transform: uppercase;
+        transition: all 0.3s ease-in-out;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        background-color: rgba(255, 255, 255, 0.07);
+        color: white;
+    }
+
+    .note-btn.view {
+        color: #00d2ff;
+        border-color: #00d2ff;
+    }
+
+    .note-btn.edit {
+        color: #facc15;
+        border-color: #facc15;
+    }
+
+    .note-btn.delete {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .note-btn.view:hover {
+        background: #00f0ff;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px #00f0ff;
+        color: #000;
+    }
+
+    .note-btn.edit:hover {
+        background: #facc15;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px #facc15;
+        color: #000;
+    }
+
+    .note-btn.delete:hover {
+        background: #ff1c1c;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px #ff1c1c;
+        color: #fff;
+    }
+
+</style>
+
+<div class="container mt-4">
+    <h2 class="all-notes-title">
+        <i class="fas fa-folder-open"></i> All Notes
+    </h2>
+
+    <div class="input-group search-bar">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search notes by title...">
+    </div>
+
+    <div class="row" id="notesContainer">
+        @foreach (var note in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="note-card">
+                    <div class="note-title">@note.Title</div>
+                    <div class="note-body">@note.Content</div>
+                    <div class="note-meta">Created: @note.CreatedAt.ToString("dd MMM yyyy | hh:mm tt")</div>
+                    <div class="note-buttons">
+                        <a asp-action="Details" asp-route-id="@note.Id" class="note-btn view">View</a>
+                        <a asp-action="Edit" asp-route-id="@note.Id" class="note-btn edit">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@note.Id" class="note-btn delete">Delete</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const notes = document.querySelectorAll(".note-card");
+
+        searchInput.addEventListener("keyup", function () {
+            const term = this.value.toLowerCase();
+            notes.forEach(note => {
+                const title = note.querySelector(".note-title").innerText.toLowerCase();
+                note.parentElement.style.display = title.includes(term) ? "block" : "none";
+            });
+        });
+    </script>
+}

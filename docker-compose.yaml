@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.stats()", "--authenticationDatabase", "admin", "-u", "root", "-p", "example"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  webapp:
+    build: .
+    container_name: dotnet-noteapp
+    ports:
+      - "8080:5050"  # Host:Container mapping
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      MongoDB__ConnectionString: "mongodb://root:example@mongodb:27017/?authSource=admin"
+      MongoDB__DatabaseName: "NoteDb"
+    # IMPORTANT: Do NOT mount appsettings.json unless it's clean
+    # volumes:
+    #   - ./appsettings.json:/app/appsettings.json
+
+volumes:
+  mongo-data:
+
