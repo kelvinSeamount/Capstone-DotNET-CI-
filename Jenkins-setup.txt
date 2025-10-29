@@ -43,3 +43,10 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 #Add Jenkins user to docker group
 sudo usermod -aG docker jenkins
+
+Install DotNET 8
+# 1. Install Microsoft package repo
+wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb

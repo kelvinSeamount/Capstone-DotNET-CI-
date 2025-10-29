@@ -1,25 +1,83 @@
 pipeline {
     agent any
-
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        IMAGE_TAG = "v${BUILD_NUMBER}"
+    }
     stages {
-        stage('Build') {
+        stage('Git Checkout') {
             steps {
-                echo 'Building...'
-                // Add build steps here
+                 git branch: 'main', credentialsId: 'git-token', url: 'https://github.com/kelvinSeamount/Capstone-DotNET-CI-.git'
             }
         }
-        stage('Test') {
+
+        stage('Gitleaks Scan') {
             steps {
-                echo 'Testing...'
-                // Add test steps here
+            sh    'gitleaks detect --report-format=json --report-path=gitleaks-report.json --exit-code=1'
             }
         }
-        stage('Deploy') {
+
+        stage('Compile') {
             steps {
-                echo 'Deploying...'
-                // Add deploy steps here
+               sh 'dotnet build'
             }
         }
+
+        stage('Trivy Scan'){
+            steps {
+                sh 'trivy fs --formart table -o trivy-fs-report.html .'
+            }
+        }
+
+        stage('Unit Testing'){
+            steps {
+                sh 'dotnet test'
+            }
+        }
+
+        stage('SonarQube Analysis'){
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=NoteApp \
+                            -Dsonar.projectKey=NoteApp '''
+                }
+            }
+        }
+
+         stage('Quality Gate Check'){
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                     waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                    }
+            }
+        }
+
+         stage('Build Image & Tag Imag'){
+            steps {
+                   script {
+                    withDockerRegistry(credentialsId: 'docker-cred') {
+                        sh "docker build -t castromeka/noteapp:$IMAGE_TAG ."
+                    }
+                }
+            }
+        }
+
+         stage('trivy Image Scan'){
+            steps {
+              sh 'trivy image --format table -o trivy-image-report.html castromeka/noteapp:$IMAGE_TAG'
+            }
+        }
+
+          stage('Push Image'){
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred') {
+                        sh "docker push castromeka/noteapp:$IMAGE_TAG"
+                    }
+                }
+            }
+        }
+
     }
 
     post {
