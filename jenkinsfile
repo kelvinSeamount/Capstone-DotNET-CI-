@@ -78,17 +78,70 @@ pipeline {
             }
         }
 
+
+           stage('Update Manifest File CD Repo') {
+            steps {
+                script {
+                    cleanWs()
+                    withCredentials([usernamePassword(credentialsId: 'git-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh '''
+                            # Clone the CD Repo
+                            git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/kelvinSeamount/Capstone-DotNET-CD.git
+                            https://github.com/kelvinSeamount/Capstone-DotNET-CD.git
+                            # Update the tag in manifest
+                            cd Capstone-DotNET-CD
+                            sed -i "s|adijaiswal/noteapp:.*|adijaiswal/noteapp:${IMAGE_TAG}|" Manifest/manifest.yaml
+                            
+                            # Confirm Changes
+                            echo "Updated manifest file contents:"
+                            cat Manifest/manifest.yaml
+                            
+                            # Commit and push the changes
+                            git config user.name "Jenkins"
+                            git config user.email "jenkins@example.com"
+                            git add Manifest/manifest.yaml
+                            git commit -m "Update image tag to ${IMAGE_TAG}"
+                            git push origin main
+                        '''
+                    }
+                    
+                }
+            }
+        }
     }
 
     post {
-        always {
-            echo 'This will always run after the stages.'
-        }
-        success {
-            echo 'This will run only if the pipeline succeeds.'
-        }
-        failure {
-            echo 'This will run only if the pipeline fails.'
+    always {
+        script {
+            def jobName = env.JOB_NAME
+            def buildNumber = env.BUILD_NUMBER
+            def pipelineStatus = currentBuild.result ?: 'UNKNOWN'
+            def bannerColor = pipelineStatus.toUpperCase() == 'SUCCESS' ? 'green' : 'red'
+
+            def body = """
+                <html>
+                <body>
+                <div style="border: 4px solid ${bannerColor}; padding: 10px;">
+                <h2>${jobName} - Build ${buildNumber}</h2>
+                <div style="background-color: ${bannerColor}; padding: 10px;">
+                <h3 style="color: white;">Pipeline Status: ${pipelineStatus.toUpperCase()}</h3>
+                </div>
+                <p>Check the <a href="${BUILD_URL}">console output</a>.</p>
+                </div>
+                </body>
+                </html>
+            """
+
+            emailext (
+                subject: "${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
+                body: body,
+                to: 'nwachukwukelvin89@gmail.com',
+                from: 'jenkins@mekadevops.com',
+                replyTo: 'jenkins@mekadevops.com',
+                mimeType: 'text/html',
+               
+            )
         }
     }
+}
 }
