@@ -87,10 +87,10 @@ pipeline {
                         sh '''
                             # Clone the CD Repo
                             git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/kelvinSeamount/Capstone-DotNET-CD.git
-                            https://github.com/kelvinSeamount/Capstone-DotNET-CD.git
+                            
                             # Update the tag in manifest
                             cd Capstone-DotNET-CD
-                            sed -i "s|adijaiswal/noteapp:.*|adijaiswal/noteapp:${IMAGE_TAG}|" Manifest/manifest.yaml
+                            sed -i "s|castromeka/noteapp:.*|castromeka/noteapp:${IMAGE_TAG}|" Manifest/manifest.yaml
                             
                             # Confirm Changes
                             echo "Updated manifest file contents:"
