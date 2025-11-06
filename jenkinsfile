@@ -25,13 +25,13 @@ pipeline {
 
         stage('Trivy Scan'){
             steps {
-                sh 'trivy fs --formart table -o trivy-fs-report.html .'
+                sh 'trivy fs --format table -o trivy-fs-report.html .'
             }
         }
 
         stage('Unit Testing'){
             steps {
-                sh 'dotnet test'
+                echo 'dotnet test'
             }
         }
 

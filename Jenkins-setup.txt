@@ -46,7 +46,16 @@ sudo usermod -aG docker jenkins
 
 Install DotNET 8
 # 1. Install Microsoft package repo
+
 wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 
 sudo dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
+
+# 2. Install required dependencies
+sudo apt-get update
+sudo apt-get install -y apt-transport-https
+
+# 3. Install .NET 8 SDK
+sudo apt-get update
+sudo apt-get install -y dotnet-sdk-8.0
