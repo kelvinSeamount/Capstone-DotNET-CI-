@@ -5,8 +5,9 @@ Overview
 
 This repository contains the Continuous Integration (CI) pipeline for a .NET application. The pipeline implements security scanning, code quality analysis, automated builds, containerization, and image scanning before triggering the deployment process.
 
+This CI pipeline works in conjunction with the CD pipeline and the repo can be found here:https://github.com/kelvinSeamount/Capstone-DotNET-CD
 
-The entire AWS infrastructure for this project is managed as code using Terraform in a separate repository.https://github.com/kelvinSeamount/Capstone-Infrastructure
+The entire AWS infrastructure for this project is managed as code using Terraform in a separate repository:https://github.com/kelvinSeamount/Capstone-Infrastructure
 
 
 Deployment Flow
